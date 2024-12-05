@@ -35,11 +35,11 @@
 //	Definition of a functor object that is passed by reference into the Print statement
 //	of the timing class.
 //	Functor object to help with accumulating values in vectors
-template< typename A, typename R >
-class flopsFunc: public std::unary_function< A, R >
+template<typename R >
+class flopsFunc
 {
 public:
-	virtual typename std::unary_function<A, R>::result_type operator( )( ) = 0;
+	virtual R operator( )( ) = 0;
 };
 
 /**
