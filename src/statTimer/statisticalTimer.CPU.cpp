@@ -62,7 +62,7 @@ std::basic_string<TCHAR> commatize (T number)
 
 //	Functor object to help with accumulating values in vectors
 template< typename T >
-struct Accumulator
+struct Accumulator: public std::function<void(T)>
 {
 	T acc;
 
