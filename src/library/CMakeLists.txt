@@ -92,7 +92,7 @@ target_include_directories(clFFT
         ${OPENCL_INCLUDE_DIRS}
     )
 
-target_link_libraries( clFFT ${OPENCL_LIBRARIES} ${CMAKE_DL_LIBS} )
+target_link_libraries(clFFT PUBLIC ${OPENCL_LIBRARIES} ${CMAKE_DL_LIBS} )
 
 set_target_properties(clFFT PROPERTIES VERSION ${clFFT_VERSION})
 set_target_properties(clFFT PROPERTIES SOVERSION ${clFFT_VERSION_MAJOR})
@@ -110,10 +110,3 @@ if( CMAKE_COMPILER_IS_GNUCC )
              DESTINATION lib${CLFFT_SUFFIX_LIB}/pkgconfig )
 endif( )
 
-# CPack configuration; include the executable into the package
-install( TARGETS clFFT
-        EXPORT Library
-        RUNTIME DESTINATION bin${CLFFT_SUFFIX_BIN}
-        LIBRARY DESTINATION lib${CLFFT_SUFFIX_LIB}
-        ARCHIVE DESTINATION lib${CLFFT_SUFFIX_LIB}/import
-        )
