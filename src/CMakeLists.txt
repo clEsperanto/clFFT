@@ -304,16 +304,7 @@ configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfig.cmake.in
 	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
 	@ONLY )
-
-
-# install( EXPORT Library DESTINATION ${destdir} FILE clFFTTargets.cmake )
-
-export(
-	EXPORT Library
-	NAMESPACE clFFT::
-	FILE "${CMAKE_CURRENT_BINARY_DIR}/clFFTTargets.cmake"
-)	
-
+install( EXPORT Library DESTINATION ${destdir} FILE clFFTTargets.cmake )
 install( FILES ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
 	DESTINATION ${destdir} )

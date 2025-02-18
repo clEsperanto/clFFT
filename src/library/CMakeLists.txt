@@ -117,4 +117,3 @@ install( TARGETS clFFT
         LIBRARY DESTINATION lib${CLFFT_SUFFIX_LIB}
         ARCHIVE DESTINATION lib${CLFFT_SUFFIX_LIB}/import
         )
-
