@@ -33,7 +33,7 @@ std::basic_string<TCHAR> commatize (T number)
 {
 	static TCHAR scratch [8*sizeof(T)];
 
-	register TCHAR * ptr = scratch + countOf( scratch );
+	TCHAR * ptr = scratch + countOf( scratch );
 	*(--ptr) = 0;
 
 	for (int digits = 3; ; )
@@ -79,23 +79,23 @@ struct Accumulator< StatData >
 //	Unary predicate used for remove_if() algorithm
 //	Currently, RangeType is expected to be a floating point type, and ValType an integer type
 template< typename T, typename R >
-struct PruneRange: public std::binary_function< T, R, bool >
+struct PruneRange
 {
-	R lower, upper;
+    R lower, upper;
 
-	PruneRange( R mean, R stdev ): lower( mean-stdev ), upper( mean+stdev ) {}
+    PruneRange( R mean, R stdev ): lower( mean-stdev ), upper( mean+stdev ) {}
 
-	bool operator( )( T val )
-	{
-		//	These comparisons can be susceptible to signed/unsigned casting problems
-		//	This is why we cast ValType to RangeType, because RangeType should always be floating and signed
-		if( static_cast< R >( val ) < lower )
-			return true;
-		else if( static_cast< R >( val ) > upper )
-			return true;
+    bool operator()( T val ) const
+    {
+        // These comparisons can be susceptible to signed/unsigned casting problems
+        // This is why we cast ValType to RangeType, because RangeType should always be floating and signed
+        if( static_cast< R >( val ) < lower )
+            return true;
+        else if( static_cast< R >( val ) > upper )
+            return true;
 
-		return false;
-	}
+        return false;
+    }
 };
 
 //	Template specialization for StatData datatypes
