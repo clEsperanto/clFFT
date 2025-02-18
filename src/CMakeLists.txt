@@ -14,7 +14,7 @@
 # limitations under the License.
 # ########################################################################
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.5)
 
 if(POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
@@ -290,106 +290,48 @@ if( CLFFT_BUILD_EXAMPLES )
 	add_subdirectory( examples )
 endif( )
 
-
-
-# Always full RPATH (for shared libraries)
-# https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
-if(BUILD_SHARED_LIBS)
-  # use, i.e. don't skip the full RPATH for the build tree
-  set(CMAKE_SKIP_BUILD_RPATH FALSE)
-  # when building, don't use the install RPATH already (but later on when installing)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  # the RPATH to be used when installing, but only if it's not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-  if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-  endif()
-endif()
-
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
-
-# if( WIN32 )
-#     set( destdir ${CMAKE_CURRENT_BINARY_DIR}/cmake/clFFT )
-# else()
-#     set( destdir ${CMAKE_CURRENT_BINARY_DIR}/cmake/clFFT )
-# endif()
-
+if( WIN32 )
+	set( destdir CMake )
+else( )
+	set( destdir lib${CLFFT_SUFFIX_LIB}/cmake/clFFT )
+endif( )
+string( REGEX REPLACE "[^/]+" ".." reldir "${destdir}" )
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
-    @ONLY
-)
-# configure_file(
-#     ${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfig.cmake.in
-#     ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
-#     @ONLY
-# )
+	${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfigVersion.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
+	@ONLY )
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfig.cmake.in
+	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
+	@ONLY )
 
-install(TARGETS clFFT EXPORT clFFTTargets
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT RuntimeLibraries
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT RuntimeLibraries
-	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-)
+
+# install( EXPORT Library DESTINATION ${destdir} FILE clFFTTargets.cmake )
 
 export(
-    EXPORT clFFTTargets
-    NAMESPACE ${PROJECT_NAME}::
-    FILE "${CMAKE_CURRENT_BINARY_DIR}/clFFTTargets.cmake"
-)
-configure_package_config_file(
-    "${PROJECT_SOURCE_DIR}/clFFTConfig.cmake.in"
-    "${PROJECT_BINARY_DIR}/clFFTConfig.cmake"
-    INSTALL_DESTINATION "${PROJECT_BINARY_DIR}"
-)
+	EXPORT Library
+	NAMESPACE clFFT::
+	FILE "${CMAKE_CURRENT_BINARY_DIR}/clFFTTargets.cmake"
+)	
 
-install(EXPORT clFFTTargets
-    FILE clFFTTargets.cmake
-    NAMESPACE clFFT::
-    DESTINATION ${PROJECT_BINARY_DIR}
-)
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
-    # ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
-    DESTINATION ${PROJECT_BINARY_DIR}
-)
-
-set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-install(
-    EXPORT clFFTTargets
-    NAMESPACE ${PROJECT_NAME}::
-    FILE clFFTTargets.cmake
-    DESTINATION ${CONFIG_INSTALL_DIR}
-)
-install(
-    FILES "${PROJECT_BINARY_DIR}/clFFTConfig.cmake"
-    "${PROJECT_BINARY_DIR}/clFFTConfigVersion.cmake"
-    DESTINATION ${CONFIG_INSTALL_DIR}
-)
-
-
+install( FILES ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
+	DESTINATION ${destdir} )
 
 # The following code is setting variables to control the behavior of CPack to generate our
 if( WIN32 )
-    set( CPACK_SOURCE_GENERATOR "ZIP" )
-    set( CPACK_GENERATOR "ZIP" )
-else()
-    set( CPACK_SOURCE_GENERATOR "TGZ" )
-    set( CPACK_GENERATOR "TGZ" )
-endif()
+	set( CPACK_SOURCE_GENERATOR "ZIP" )
+	set( CPACK_GENERATOR "ZIP" )
+else( )
+	set( CPACK_SOURCE_GENERATOR "TGZ" )
+	set( CPACK_GENERATOR "TGZ" )
+endif( )
 
 if( CLFFT_BUILD64 )
-    set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64" )
-else()
-    set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32" )
-endif()
+	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64" )
+else( )
+	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32" )
+endif( )
 
 set( CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-Source" )
 
@@ -405,53 +347,3 @@ include( CPack )
 
 # reset cmake module path to any earlier path
 set(CMAKE_MODULE_PATH ${old_module_path})
-
-
-# if( WIN32 )
-# 	set( destdir CMake )
-# else( )
-# 	set( destdir lib${CLFFT_SUFFIX_LIB}/cmake/clFFT )
-# endif( )
-# string( REGEX REPLACE "[^/]+" ".." reldir "${destdir}" )
-# configure_file(
-# 	${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfigVersion.cmake.in
-# 	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
-# 	@ONLY )
-# configure_file(
-# 	${CMAKE_CURRENT_SOURCE_DIR}/clFFTConfig.cmake.in
-# 	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
-# 	@ONLY )
-# install( EXPORT Library DESTINATION ${destdir} FILE clFFTTargets.cmake )
-# install( FILES ${CMAKE_CURRENT_BINARY_DIR}/clFFTConfigVersion.cmake
-# 	${CMAKE_CURRENT_BINARY_DIR}/clFFTConfig.cmake
-# 	DESTINATION ${destdir} )
-
-# # The following code is setting variables to control the behavior of CPack to generate our
-# if( WIN32 )
-# 	set( CPACK_SOURCE_GENERATOR "ZIP" )
-# 	set( CPACK_GENERATOR "ZIP" )
-# else( )
-# 	set( CPACK_SOURCE_GENERATOR "TGZ" )
-# 	set( CPACK_GENERATOR "TGZ" )
-# endif( )
-
-# if( CLFFT_BUILD64 )
-# 	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x64" )
-# else( )
-# 	set( CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-x32" )
-# endif( )
-
-# set( CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${clFFT_VERSION}-${CMAKE_HOST_SYSTEM_NAME}-Source" )
-
-# set( CPACK_PACKAGE_VERSION_MAJOR ${clFFT_VERSION_MAJOR} )
-# set( CPACK_PACKAGE_VERSION_MINOR ${clFFT_VERSION_MINOR} )
-# set( CPACK_PACKAGE_VERSION_PATCH ${clFFT_VERSION_PATCH} )
-# set( CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenCL implementation of an FFT library" )
-# set( CPACK_PACKAGE_VENDOR "Neutral" )
-# set( CPACK_SOURCE_IGNORE_FILES "/\\\\.hg/;/\\\\.svn/;/\\\\.git/" )
-
-# # Define all variables that influence CPack before including CPack, such as install targets
-# include( CPack )
-
-# # reset cmake module path to any earlier path
-# set(CMAKE_MODULE_PATH ${old_module_path})
