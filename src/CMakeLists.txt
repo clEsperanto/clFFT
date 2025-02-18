@@ -169,6 +169,8 @@ get_filename_component( C_COMPILER_NAME ${CMAKE_C_COMPILER} NAME_WE )
 # message( "C_COMPILER_NAME: " ${C_COMPILER_NAME} )
 # message( "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER} )
 
+set( CMAKE_CXX_STANDARD 17 )
+
 if( APPLE )
 	# avoid warning on newer cmake versions
 	set( CMAKE_MACOSX_RPATH 0 )
