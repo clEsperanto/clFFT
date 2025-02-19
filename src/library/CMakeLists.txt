@@ -89,10 +89,10 @@ target_include_directories(clFFT
         $<BUILD_INTERFACE:${clFFT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${clFFT_BINARY_DIR}/include>
     PRIVATE
-        ${OPENCL_INCLUDE_DIRS}
+        ${OpenCL_INCLUDE_DIRS}
     )
 
-target_link_libraries( clFFT ${OPENCL_LIBRARIES} ${CMAKE_DL_LIBS} )
+target_link_libraries( clFFT ${OpenCL_LIBRARIES} ${CMAKE_DL_LIBS} )
 
 set_target_properties(clFFT PROPERTIES VERSION ${clFFT_VERSION})
 set_target_properties(clFFT PROPERTIES SOVERSION ${clFFT_VERSION_MAJOR})
