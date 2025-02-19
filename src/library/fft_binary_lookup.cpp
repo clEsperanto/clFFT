@@ -449,26 +449,24 @@ bool FFTBinaryLookup::found()
 }
 
 static cl_int getSingleBinaryFromProgram(cl_program program,
-                                         std::vector<unsigned char*> & binary)
+    std::vector<unsigned char*> & binary)
 {
-    // From progra, fetch number of devices
-    size_t num_devices;
+    // From program, fetch number of devices
+    cl_uint num_devices;
     cl_int err = clGetProgramInfo(program, CL_PROGRAM_NUM_DEVICES,
-                                  sizeof(size_t),
-                                  &num_devices, NULL);
+                                    sizeof(cl_uint),
+                                    &num_devices, NULL);
     if (err != CL_SUCCESS)
     {
-        std::cerr << "Error querying for number of devices" << std::endl;
-        return err;
+    std::cerr << "Error querying for number of devices" << std::endl;
+    return err;
     }
-
-
 
     // 3 - Determine the size of each program binary
     size_t * sizes = new size_t[num_devices];
     err = clGetProgramInfo(program, CL_PROGRAM_BINARY_SIZES,
-                                  sizeof(size_t) * num_devices,
-                                  sizes, NULL);
+                            sizeof(size_t) * num_devices,
+                            sizes, NULL);
     if (err != CL_SUCCESS)
     {
         std::cerr << "Error querying for program binary sizes" << std::endl;
@@ -477,21 +475,29 @@ static cl_int getSingleBinaryFromProgram(cl_program program,
     }
 
     binary.resize(num_devices);
-    for (int i = 0; i < binary.size(); i++)
+    for(cl_uint i=0 ; i<num_devices ; ++i)
     {
         binary[i] = new unsigned char[sizes[i]];
     }
-
-    // unsigned char * binary_address[1] = { binary[0] };
+    unsigned char **binary_ptrs = new unsigned char*[num_devices];
+    for(cl_uint i = 0; i < num_devices; ++i)
+    {
+        binary_ptrs[i] = binary[i];
+    }
 
     // 4 - Get all of the program binaries
     err = clGetProgramInfo(program, CL_PROGRAM_BINARIES, num_devices * sizeof(unsigned char*),
-        binary.data(), NULL);
+    binary_ptrs, NULL);
 
+    delete[] binary_ptrs;
+    delete[] sizes;
 
     if (err != CL_SUCCESS)
     {
-		delete[] binary[0];
+        for(size_t i = 0; i < num_devices; ++i)
+        {
+            delete[] binary[i];
+        }
 #if CAPS_DEBUG
         std::cerr << "Error querying for program binaries" << std::endl;
 #endif
