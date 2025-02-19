@@ -17,10 +17,14 @@
 #ifndef __CLFFT_CLFFT_BINARY_LOOKUP__
 #define __CLFFT_CLFFT_BINARY_LOOKUP__
 
+#ifndef CL_TARGET_OPENCL_VERSION
+#define CL_TARGET_OPENCL_VERSION 120
+#endif
+
 #if defined(__APPLE__) || defined(__MACOSX)
-#include <OpenCL/cl.h>
+#include <OpenCL/opencl.h>
 #else
-#include <CL/cl.h>
+#include <CL/opencl.h>
 #endif
 
 #include <string>
