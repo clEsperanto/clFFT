@@ -81,7 +81,7 @@ set( clFFT.Files ${clFFT.Source} ${clFFT.Headers} )
 #	add_definitions( ${Boost_LIB_DIAGNOSTIC_DEFINITIONS} )
 add_definitions( "/DCLFFT_EXPORTS" )
 
-add_library( clFFT ${clFFT.Files} )
+add_library( clFFT STATIC ${clFFT.Files} )
 
 target_include_directories(clFFT
     PUBLIC
