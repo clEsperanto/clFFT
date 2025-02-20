@@ -134,7 +134,11 @@ else( )
 endif( )
 
 # This will define OpenCL_FOUND
-find_package( OpenCL )
+if (OpenCL_LIBRARIES AND OpenCL_INCLUDE_DIRS)
+    set(OpenCL_FOUND true)
+else()
+    find_package(OpenCL)
+endif()
 
 # This will define FFTW_FOUND
 find_package( FFTW )
